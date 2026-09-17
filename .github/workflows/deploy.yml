@@ -1,0 +1,88 @@
+name: Deploy GIFs App
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate environment for build
+        env:
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const apiKey = process.env.GIPHY_API_KEY;
+          if (!apiKey) {
+            throw new Error('Falta el secreto GIPHY_API_KEY');
+          }
+
+          const environment = {
+            giphyUrl: 'https://api.giphy.com/v1',
+            giphyApiKey: apiKey,
+            companyName: 'GIFs',
+            companyName2: 'App',
+            companySlogan: 'Explora y busca GIFs'
+          };
+
+          fs.mkdirSync('src/environments', { recursive: true });
+          fs.writeFileSync(
+            'src/environments/environment.ts',
+            `export const environment = ${JSON.stringify(environment, null, 2)};\n`
+          );
+          NODE
+
+      - name: Build for GitHub Pages
+        run: npm run build -- --configuration production --base-href /gifs-app/
+
+      - name: Prepare static hosting
+        run: |
+          cp dist/gifs-app/browser/index.html dist/gifs-app/browser/404.html
+          touch dist/gifs-app/browser/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/gifs-app/browser
+          include-hidden-files: true
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
