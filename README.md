@@ -1,59 +1,86 @@
-# GifsApp
+# GIFs App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
+A GIF discovery app built with **Angular and Tailwind CSS**. Browse trending GIFs, search for something specific, and revisit previous searches.
 
-## Development server
+**[Live Demo](https://dddbbbppp.github.io/gifs-app/)** · **[Source Code](https://github.com/DDDBBBPPP/gifs-app)**
 
-To start a local development server, run:
+## Overview
 
-```bash
-ng serve
-```
+GIFs App is a frontend project that integrates the Giphy API to display GIFs in a responsive interface.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Features
 
-## Code scaffolding
+- **Trending GIFs:** explore GIFs currently returned by Giphy's trending endpoint.
+- **Search:** find GIFs using a text query.
+- **Search history:** revisit previous searches without making the same request again.
+- **Local persistence:** search history is stored in the browser using `localStorage`.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+The app requests up to 20 GIFs per trending or search request.
 
-```bash
-ng generate component component-name
-```
+## Tech Stack
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- Angular 21
+- TypeScript
+- Tailwind CSS 4
+- Giphy API
+- Angular Signals
+- GitHub Pages and GitHub Actions
 
-```bash
-ng generate --help
-```
+## Live Demo
 
-## Building
+**[Open GIFs App](https://dddbbbppp.github.io/gifs-app/)**
 
-To build the project run:
+The live demo requires an internet connection and depends on the availability of the Giphy API. Search history is stored locally in your browser rather than in an account or remote database.
 
-```bash
-ng build
-```
+## Run Locally
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Requirements
 
-## Running unit tests
+- Node.js and npm
+- A Giphy API key
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### 1. Clone and install
 
 ```bash
-ng e2e
+git clone https://github.com/DDDBBBPPP/gifs-app.git
+cd gifs-app
+npm ci
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### 2. Configure the Giphy API
 
-## Additional Resources
+Create the folder `src/environments` if it does not exist.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Inside that folder, create **both** `environment.ts` and `environment.development.ts` with the following content, replacing the placeholder with your own Giphy API key:
+
+```typescript
+export const environment = {
+  giphyUrl: 'https://api.giphy.com/v1',
+  giphyApiKey: 'YOUR_GIPHY_API_KEY',
+  companyName: 'GIFs',
+  companyName2: 'App',
+  companySlogan: 'Explora y busca GIFs',
+};
+```
+
+The environment files are excluded from Git by this project. Do not commit personal API keys.
+
+**Important:** this is a client-side application, so an API key included in its browser build or requests can be inspected by visitors. Use a key intended for browser-based applications, and configure any available restrictions in your Giphy account. A GitHub Actions secret prevents the key from being stored directly in the repository, but it does **not** make the key private in the deployed app.
+
+### 3. Start the development server
+
+```bash
+npm start
+```
+
+Open the local URL displayed in the terminal, typically `http://localhost:4200/`.
+
+### Production build
+
+```bash
+npm run build -- --configuration production
+```
+
+## Project Scope
+
+GIFs App demonstrates API integration, reactive state management with Angular Signals, and browser-based persistence. It does not provide user accounts or synchronize search history between devices.
